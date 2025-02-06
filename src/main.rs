@@ -10,7 +10,6 @@ use std::{
   ops::BitAnd
 };
 use polars::prelude::CsvReader;
-use chrono::{NaiveDateTime, NaiveDate};
 
 #[derive(Deserialize, Debug)]
 struct FileInfo {
@@ -81,6 +80,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
   let mut running_df: DataFrame = CsvReader::new(cursor)
     .finish()
     .expect("CSV reading should not fail");
-  
+
   Ok(())
 }

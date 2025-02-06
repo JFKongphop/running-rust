@@ -1,5 +1,7 @@
 use polars::prelude::*;
 
+use super::times::{date_to_timestamp, number_to_month};
+
 pub fn activity_to_type(activity_col: &Column) -> Column {
   activity_col.str()
     .unwrap() 
