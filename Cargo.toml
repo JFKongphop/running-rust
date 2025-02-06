@@ -1,0 +1,15 @@
+[package]
+name = "rust-csv"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = "0.4.39"
+dotenv = "0.15.0"
+futures = "0.3.31"
+polars = "0.45.1"
+polars-lazy = "0.46.0"
+reqwest = { version = "0.10", features = ["json"] }
+serde = "1.0.217"
+tokio = { version = "0.2", features = ["full"] }
+ultibi = "0.1.6"
