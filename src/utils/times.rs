@@ -1,3 +1,4 @@
+use polars::prelude::*;
 use chrono::{NaiveDateTime, NaiveDate};
 
 pub fn number_to_month(num: u32) -> Option<String> {
@@ -15,4 +16,27 @@ pub fn date_to_timestamp(full_date: &str) -> Option<i64> {
   NaiveDateTime::parse_from_str(&date_str, format)
     .ok()
     .map(|dt| dt.and_utc().timestamp())
+}
+
+pub fn convert_date_timestamp(date: &str) ->i64 {
+  let format = "%Y-%m-%d %H:%M:%S";
+  let date = NaiveDateTime::parse_from_str(&date, format)
+    .ok()
+    .expect("Invalid date");
+
+  date.and_utc().timestamp()
+}
+
+pub fn fill_missing_months(df: &DataFrame) -> PolarsResult<DataFrame> {
+  let months: Vec<String> = (1..=12)
+    .map(|m| format!("2567-{:02}", m)) 
+    .collect();
+  
+  let full_months_df = df!("Date" => &months)?;
+
+  let result = full_months_df
+    .left_join(df, ["Date"], ["Date"])?
+    .fill_null(FillNullStrategy::Zero)?;
+
+  Ok(result)
 }
