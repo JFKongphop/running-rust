@@ -3,7 +3,9 @@ use running_rust::utils::{
   apply_column::activity_to_type, 
   fetch_data::fetch_text_csv, 
   filter_column::{
-    activity_filter, distance_filter, null_filter
+    activity_filter, 
+    distance_filter, 
+    null_filter
   }
 };
 use dotenv::dotenv;
