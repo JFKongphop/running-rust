@@ -1,13 +1,20 @@
 use std::error::Error;
 use running_rust::utils::{
-  agg_data::{sort_ascending, sum_distance}, 
-  apply_column::{activity_to_type, only_year_month_column}, 
+  agg_data::{
+    group_sum, 
+    sort_ascending, 
+    sum_distance
+  }, 
+  apply_column::{
+    activity_to_type, 
+    only_year_month_column
+  }, 
   fetch_data::fetch_text_csv, 
   filter_column::{
     activity_filter, 
     distance_filter, 
     null_filter, year_filter
-  }
+  }, times::fill_missing_months
 };
 use dotenv::dotenv;
 
@@ -49,16 +56,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
   let only_year_month = only_2024_df.apply("Date", only_year_month_column)?; 
 
   
-  let month_distance_sum_2024_df = &only_year_month
-    .group_by(["Date"])?
-    .select(["Distance(km)"])
-    .sum()?;
-  let sorted_month_2024_df = sort_ascending(&month_distance_sum_2024_df, "Date")?;
-
-  println!("{:?}", sorted_month_2024_df);
-
-
-
+  let month_distance_sum_2024_df = group_sum(
+    &only_year_month, 
+    "Date", 
+    "Distance(km)"
+  )?;
+  let fill_missing_month_2024 = fill_missing_months(&month_distance_sum_2024_df)?;
+  let _monthly_distances_2024 = sort_ascending(&fill_missing_month_2024, "Date")?;
 
 
 
