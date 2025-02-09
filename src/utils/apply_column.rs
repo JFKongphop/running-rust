@@ -1,6 +1,11 @@
 use polars::prelude::*;
 
-use super::times::{date_to_timestamp, number_to_month};
+use crate::types::polars_type::PolarsFrame;
+
+use super::times::{
+  date_to_timestamp, 
+  number_to_month
+};
 
 pub fn activity_to_type(activity_col: &Column) -> Column {
   activity_col.str()
@@ -53,7 +58,7 @@ pub fn convert_date_month(str_val: &Column) -> Column {
     .into_column()
 }
 
-pub fn create_timestamp_column(running_df: &DataFrame) -> PolarsResult<DataFrame> {
+pub fn create_timestamp_column(running_df: &DataFrame) -> PolarsFrame {
   let timestamp_col = running_df
       .column("Date")?
       .str()?

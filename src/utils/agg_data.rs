@@ -1,6 +1,11 @@
 use polars::prelude::*;
 
-pub fn sum_distance(df: &DataFrame) -> PolarsResult<f64> {
+use crate::types::polars_type::{
+  PolarsFrame, 
+  PolarsGenType
+};
+
+pub fn sum_distance(df: &DataFrame) -> PolarsGenType<f64> {
   let distance_column = df.column("Distance(km)")?.f64()?;
   Ok(distance_column.sum().unwrap_or(0.0))
 }
@@ -9,4 +14,6 @@ pub fn sort_ascending(df: &DataFrame, column: &str) -> PolarsResult<DataFrame> {
   df.sort([column], Default::default())
 }
 
-pub fn group_sum(df: &DataFrame, group_column: &str, sum_column: &str) -> Pol
+pub fn group_sum(df: &DataFrame, group_column: &str, sum_column: &str) -> PolarsFrame {
+
+}

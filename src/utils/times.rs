@@ -1,5 +1,10 @@
 use polars::prelude::*;
-use chrono::{NaiveDateTime, NaiveDate};
+use chrono::{
+  NaiveDateTime, 
+  NaiveDate
+};
+
+use crate::types::polars_type::PolarsFrame;
 
 pub fn number_to_month(num: u32) -> Option<String> {
   NaiveDate::from_ymd_opt(2000, num, 1)
@@ -27,7 +32,7 @@ pub fn convert_date_timestamp(date: &str) ->i64 {
   date.and_utc().timestamp()
 }
 
-pub fn fill_missing_months(df: &DataFrame) -> PolarsResult<DataFrame> {
+pub fn fill_missing_months(df: &DataFrame) -> PolarsFrame {
   let months: Vec<String> = (1..=12)
     .map(|m| format!("2567-{:02}", m)) 
     .collect();

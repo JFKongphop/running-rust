@@ -1,7 +1,7 @@
 use polars::prelude::*;
 use std::ops::BitAnd;
 
-type PolarsFrame = PolarsResult<DataFrame>;
+use crate::types::polars_type::PolarsFrame;
 
 pub fn activity_filter(df: &DataFrame, activity: &str) -> PolarsFrame {
   let activity_column = df.column("Activity")?.str()?;
