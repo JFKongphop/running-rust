@@ -15,5 +15,8 @@ pub fn sort_ascending(df: &DataFrame, column: &str) -> PolarsResult<DataFrame> {
 }
 
 pub fn group_sum(df: &DataFrame, group_column: &str, sum_column: &str) -> PolarsFrame {
-
+  df
+    .group_by([group_column])?
+    .select([sum_column])
+    .sum()
 }
