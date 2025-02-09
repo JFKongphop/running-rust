@@ -14,6 +14,7 @@ pub fn sort_ascending(df: &DataFrame, column: &str) -> PolarsResult<DataFrame> {
   df.sort([column], Default::default())
 }
 
+#[allow(deprecated)]
 pub fn group_sum(df: &DataFrame, group_column: &str, sum_column: &str) -> PolarsFrame {
   df
     .group_by([group_column])?
