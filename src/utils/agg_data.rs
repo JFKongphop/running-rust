@@ -8,3 +8,5 @@ pub fn sum_distance(df: &DataFrame) -> PolarsResult<f64> {
 pub fn sort_ascending(df: &DataFrame, column: &str) -> PolarsResult<DataFrame> {
   df.sort([column], Default::default())
 }
+
+pub fn group_sum(df: &DataFrame, group_column: &str, sum_column: &str) -> Pol
