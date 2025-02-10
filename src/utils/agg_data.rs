@@ -21,3 +21,11 @@ pub fn group_sum(df: &DataFrame, group_column: &str, sum_column: &str) -> Polars
     .select([sum_column])
     .sum()
 }
+
+pub fn count_running(df: &DataFrame) -> usize {
+  df.height()
+}
+
+pub fn count_day(df: &DataFrame) -> PolarsGenType<usize> {
+  df.column("Date")?.n_unique()
+}
