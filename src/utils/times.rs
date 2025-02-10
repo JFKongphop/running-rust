@@ -33,8 +33,16 @@ pub fn convert_date_timestamp(date: &str) ->i64 {
 }
 
 pub fn fill_missing_months(df: &DataFrame) -> PolarsFrame {
+  let first_row = df.column("Date")?.str()?;
+
+  let mut year = "";
+  if let Some(date) = first_row.get(0) {
+    year = &date[..4];
+    println!("Year: {}", year);
+  }
+
   let months: Vec<String> = (1..=12)
-    .map(|m| format!("2567-{:02}", m)) 
+    .map(|m| format!("{}-{:02}", year, m)) 
     .collect();
   
   let full_months_df = df!("Date" => &months)?;

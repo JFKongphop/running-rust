@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
   //   .sort([timestamp_col], Default::default())?;
 
   // println!("{:?}", only_date_df);
-  let mut only_2024_df = year_filter(&running_df, "2567")?;
+  let mut only_2024_df = year_filter(&running_df, "2568")?;
   let only_year_month = only_2024_df.apply("Date", only_year_month_column)?; 
 
   
@@ -63,6 +63,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
   )?;
   let fill_missing_month_2024 = fill_missing_months(&month_distance_sum_2024_df)?;
   let _monthly_distances_2024 = sort_ascending(&fill_missing_month_2024, "Date")?;
+  
+
+  println!("{:?}", _monthly_distances_2024);
 
 
 
