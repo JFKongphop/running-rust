@@ -38,7 +38,6 @@ pub fn fill_missing_months(df: &DataFrame) -> PolarsFrame {
   let mut year = "";
   if let Some(date) = first_row.get(0) {
     year = &date[..4];
-    println!("Year: {}", year);
   }
 
   let months: Vec<String> = (1..=12)
