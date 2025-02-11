@@ -30,6 +30,16 @@ pub fn month_filter(df: &DataFrame, year_month: &str) -> PolarsFrame {
   df.filter(&mask)
 }
 
+pub fn date_filter(df: &DataFrame, full_date: &str) -> PolarsFrame {
+  let date_column = df.column("Date")?.str()?;
+  let mask = date_column
+    .into_iter()
+    .map(|date| date.and_then(|d| Some(d.starts_with(full_date))))
+    .collect::<BooleanChunked>();
+  
+  df.filter(&mask)
+}
+
 pub fn distance_filter(df: &DataFrame, min: f64, max: f64) -> PolarsFrame {
   let distance_column = df.column("Distance(km)")?.f64()?;
   let mask = distance_column

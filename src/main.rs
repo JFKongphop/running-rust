@@ -15,7 +15,8 @@ use running_rust::utils::{
   fetch_data::fetch_text_csv, 
   filter_column::{
     activity_filter, 
-    distance_filter,
+    date_filter, 
+    distance_filter, 
     month_filter, 
     null_filter, 
     year_filter
@@ -86,6 +87,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
   )?; 
   let jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
   println!("{}", jan_2025_sorted);
+
+  let jan_14_2025 = date_filter(&running_df, "2568-01-14")?;
+  println!("{}", jan_14_2025);
 
 
 
