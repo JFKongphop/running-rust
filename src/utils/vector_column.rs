@@ -1,4 +1,5 @@
 use polars::prelude::*;
+use crate::types::polars_type::PolarsGenType;
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -7,7 +8,7 @@ pub struct MonthlyDistance {
   distance: f64,
 }
 
-pub fn dataframe_to_struct_vec(df: &DataFrame) -> PolarsResult<Vec<MonthlyDistance>> {
+pub fn dataframe_to_struct_vec(df: &DataFrame) -> PolarsGenType<Vec<MonthlyDistance>> {
   let dates = df.column("Date")?.str()?;
   let distances = df.column("Distance(km)_sum")?.f64()?;
 
@@ -21,4 +22,18 @@ pub fn dataframe_to_struct_vec(df: &DataFrame) -> PolarsResult<Vec<MonthlyDistan
     .collect();
 
   Ok(struct_vec)
+}
+
+pub fn date_vector(date_col: &Column) -> PolarsGenType<Vec<String>> {
+  let mut unique_date: Vec<String> = date_col
+    .str()?
+    .unique()?
+    .into_iter()
+    .flatten()
+    .map(|s| s.to_string())
+    .collect();
+
+  unique_date.sort();
+  
+  Ok(unique_date)
 }
