@@ -66,26 +66,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
   let year = "2567";
   let mut only_2024_df = year_filter(&running_df, &year)?;
-  let only_year_month = only_2024_df.apply("Date", only_year_month_column)?; 
+  let only_year_month = only_2024_df.apply("Date", only_year_month_column)?;
   let year_2024_sum_distance = sum_distance(&only_year_month)?;
   println!("Year {} Distance {}", year, year_2024_sum_distance);
-  
-  let month_distance_sum_2024_df = group_sum(
-    &only_year_month, 
-    "Date", 
-    "Distance(km)"
-  )?;
+
+  let month_distance_sum_2024_df = group_sum(&only_year_month, "Date", "Distance(km)")?;
   let fill_missing_month_2024 = fill_missing_months(&month_distance_sum_2024_df)?;
   let _monthly_distances_2024 = sort_ascending(&fill_missing_month_2024, "Date")?;
-  
+
   println!("{:?}", _monthly_distances_2024);
 
   let jan_2025_df = month_filter(&running_df, "2568-01")?;
-  let jan_2025_day_sum_df = group_sum(
-    &jan_2025_df,
-    "Date",
-    "Distance(km)"
-  )?; 
+  let jan_2025_day_sum_df = group_sum(&jan_2025_df, "Date", "Distance(km)")?;
   let jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
   // println!("{}", jan_2025_sorted);
 
@@ -97,8 +89,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
   let sum_oct_dec_2024 = sum_distance(&oct_dec_2024)?;
   println!("{}", sum_oct_dec_2024);
-
-
 
   Ok(())
 }

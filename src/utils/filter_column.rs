@@ -1,21 +1,19 @@
 use polars::prelude::*;
-use std::ops::{BitAnd, BitOr};
+use std::ops::BitAnd;
 
 use crate::types::polars_type::PolarsFrame;
-
-use super::apply_column::create_timestamp_column;
 
 pub fn activity_filter(df: &DataFrame, activity: &str) -> PolarsFrame {
   let activity_column = df.column("Activity")?.str()?;
   let mask = activity_column.equal(activity);
-  
+
   df.filter(&mask)
 }
 
 pub fn year_filter(df: &DataFrame, year: &str) -> PolarsFrame {
   let date_column = df.column("Date")?.str()?;
   let mask = date_column
-    .into_iter()    
+    .into_iter()
     .map(|opt_val| opt_val.map(|val| val.starts_with(year)))
     .collect::<BooleanChunked>();
 
@@ -38,7 +36,7 @@ pub fn date_filter(df: &DataFrame, full_date: &str) -> PolarsFrame {
     .into_iter()
     .map(|date| date.and_then(|d| Some(d.starts_with(full_date))))
     .collect::<BooleanChunked>();
-  
+
   df.filter(&mask)
 }
 
@@ -50,8 +48,7 @@ pub fn month_range_filter(df: &DataFrame, start_month: &str, end_month: &str) ->
   if month > 10 {
     month = (month + 1) - 12;
     year += 1
-  }
-  else {
+  } else {
     month += 1
   }
 
@@ -68,10 +65,8 @@ pub fn month_range_filter(df: &DataFrame, start_month: &str, end_month: &str) ->
 
 pub fn distance_filter(df: &DataFrame, min: f64, max: f64) -> PolarsFrame {
   let distance_column = df.column("Distance(km)")?.f64()?;
-  let mask = distance_column
-    .gt(min)
-    .bitand(distance_column.lt(max));
-  
+  let mask = distance_column.gt(min).bitand(distance_column.lt(max));
+
   df.filter(&mask)
 }
 
