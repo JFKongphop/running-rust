@@ -16,7 +16,11 @@ use running_rust::utils::{
   filter_column::{
     activity_filter, date_filter, distance_filter, month_filter, month_range_filter, null_filter, year_filter
   }, 
-  times::fill_missing_months, vector_column::date_vector
+  times::fill_missing_months, 
+  vector_column::{
+    date_distance_vector, 
+    date_vector
+  }
 };
 use dotenv::dotenv;
 
@@ -67,28 +71,36 @@ async fn main() -> Result<(), Box<dyn Error>> {
   let month_distance_sum_2024_df = group_sum(&only_year_month, "Date", "Distance(km)")?;
   let fill_missing_month_2024 = fill_missing_months(&month_distance_sum_2024_df)?;
   let _monthly_distances_2024 = sort_ascending(&fill_missing_month_2024, "Date")?;
+  // let _vec_monthly_distances_2024 = date_distance_vector(&_monthly_distances_2024);
 
-  // println!("{:?}", _monthly_distances_2024);
+  // println!("{:#?}", _vec_monthly_distances_2024);
 
   let jan_2025_df = month_filter(&running_df, "2568-01")?;
   let jan_2025_day_sum_df = group_sum(&jan_2025_df, "Date", "Distance(km)")?;
-  let _jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
-  // println!("{}", jan_2025_sorted);
+  let jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
+  let date_col_jan_2025 = jan_2025_sorted.column("Date")?;
+  let distance_col_jan_2025 = jan_2025_sorted.column("Distance(km)_sum")?;
+  let _vec_jan_2025_sorted = date_distance_vector(
+    &jan_2025_sorted,
+    date_col_jan_2025,
+    distance_col_jan_2025
+  )?;
+  println!("{:#?}", _vec_jan_2025_sorted);
 
   let _jan_14_2025 = date_filter(&running_df, "2568-01-14")?;
 
   let _oct_dec_2024 = month_range_filter(&running_df, "2567-10", "2567-12")?;
-  // println!("{}", oct_dec_2024);
+  // println!("{}", _oct_dec_2024);
 
   // let sum_oct_dec_2024 = sum_distance(&_oct_dec_2024)?;
-  // println!("{}", sum_oct_dec_2024);
+  // println!("{}", _sum_oct_dec_2024);
 
   
   // println!("{}", running_df);
 
   let date_col = running_df.column("Date")?;
   let _unique_date = date_vector(&date_col)?;
-  println!("{:#?}", _unique_date);
+  // println!("{:#?}", _unique_date);
 
   Ok(())
 }

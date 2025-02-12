@@ -8,8 +8,12 @@ pub struct MonthlyDistance {
   distance: f64,
 }
 
-pub fn dataframe_to_struct_vec(df: &DataFrame) -> PolarsGenType<Vec<MonthlyDistance>> {
-  let dates = df.column("Date")?.str()?;
+pub fn date_distance_vector(
+  df: &DataFrame, 
+  date_col: &Column, 
+  distance_col: &Column
+) -> PolarsGenType<Vec<MonthlyDistance>> {
+  let dates = date_col.str()?;
   let distances = df.column("Distance(km)_sum")?.f64()?;
 
   let struct_vec: Vec<MonthlyDistance> = dates
