@@ -1,7 +1,9 @@
 use polars::prelude::*;
-use std::ops::BitAnd;
+use std::ops::{BitAnd, BitOr};
 
 use crate::types::polars_type::PolarsFrame;
+
+use super::apply_column::create_timestamp_column;
 
 pub fn activity_filter(df: &DataFrame, activity: &str) -> PolarsFrame {
   let activity_column = df.column("Activity")?.str()?;
@@ -37,6 +39,30 @@ pub fn date_filter(df: &DataFrame, full_date: &str) -> PolarsFrame {
     .map(|date| date.and_then(|d| Some(d.starts_with(full_date))))
     .collect::<BooleanChunked>();
   
+  df.filter(&mask)
+}
+
+pub fn month_range_filter(df: &DataFrame, start_month: &str, end_month: &str) -> PolarsFrame {
+  let parts: Vec<&str> = end_month.split('-').collect();
+  let mut year: i32 = parts[0].parse().unwrap();
+  let mut month: i32 = parts[1].parse().unwrap();
+
+  if month > 10 {
+    month = (month + 1) - 12;
+    year += 1
+  }
+  else {
+    month += 1
+  }
+
+  let end_month = format!("{}-{:02}", year, month);
+  let end_month = end_month.as_str();
+
+  let date_column = df.column("Date")?.str()?;
+  let mask = date_column
+    .gt_eq(start_month)
+    .bitand(date_column.lt_eq(end_month));
+
   df.filter(&mask)
 }
 

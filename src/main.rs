@@ -19,6 +19,7 @@ use running_rust::utils::{
     distance_filter, 
     month_filter, 
     null_filter, 
+    month_range_filter, 
     year_filter
   }, 
   times::fill_missing_months
@@ -86,10 +87,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
     "Distance(km)"
   )?; 
   let jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
-  println!("{}", jan_2025_sorted);
+  // println!("{}", jan_2025_sorted);
 
   let jan_14_2025 = date_filter(&running_df, "2568-01-14")?;
-  println!("{}", jan_14_2025);
+  // println!("{}", jan_14_2025);
+
+  let oct_dec_2024 = month_range_filter(&running_df, "2567-10", "2568-01")?;
+  println!("{}", oct_dec_2024);
+
+  let sum_oct_dec_2024 = sum_distance(&oct_dec_2024)?;
+  println!("{}", sum_oct_dec_2024);
 
 
 
