@@ -81,7 +81,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
   let date_col_jan_2025 = jan_2025_sorted.column("Date")?;
   let distance_col_jan_2025 = jan_2025_sorted.column("Distance(km)_sum")?;
   let _vec_jan_2025_sorted = date_distance_vector(
-    &jan_2025_sorted,
     date_col_jan_2025,
     distance_col_jan_2025
   )?;
