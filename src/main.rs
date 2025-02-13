@@ -14,7 +14,13 @@ use running_rust::utils::{
   }, 
   fetch_data::fetch_text_csv, 
   filter_column::{
-    activity_filter, date_filter, distance_filter, month_filter, month_range_filter, null_filter, year_filter
+    activity_filter, 
+    date_filter, 
+    distance_filter, 
+    month_filter, 
+    month_range_filter, 
+    null_filter, 
+    year_filter
   }, 
   times::fill_missing_months, 
   vector_column::{
@@ -77,14 +83,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
   let jan_2025_df = month_filter(&running_df, "2568-01")?;
   let jan_2025_day_sum_df = group_sum(&jan_2025_df, "Date", "Distance(km)")?;
-  let jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
+  let mut jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
   let date_col_jan_2025 = jan_2025_sorted.column("Date")?;
   let distance_col_jan_2025 = jan_2025_sorted.column("Distance(km)_sum")?;
   let _vec_jan_2025_sorted = date_distance_vector(
     date_col_jan_2025,
     distance_col_jan_2025
   )?;
-  println!("{:#?}", _vec_jan_2025_sorted);
+  println!("{:?}", jan_2025_df/*.select(["Date", "Distance(km)", "Pace(min)"])*/);
+  let jan_2025_sorted = jan_2025_sorted.rename(
+    "Distance(km)_sum", 
+    "Distance(km)".into()
+  )?;
+  println!("{:#?}", jan_2025_sorted);
 
   let _jan_14_2025 = date_filter(&running_df, "2568-01-14")?;
 
