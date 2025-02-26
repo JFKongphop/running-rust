@@ -1,6 +1,6 @@
-use polars::prelude::*;
 use crate::types::polars_type::PolarsGenType;
 use itertools::izip;
+use polars::prelude::*;
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -15,12 +15,12 @@ pub struct DateDistancePaceHr {
   date: String,
   distance: f64,
   pace: String,
-  hr: f64
+  hr: f64,
 }
 
 pub fn date_distance_vector(
-  date_col: &Column, 
-  distance_col: &Column
+  date_col: &Column,
+  distance_col: &Column,
 ) -> PolarsGenType<Vec<DateDistance>> {
   let dates = date_col.str()?;
   let distances = distance_col.f64()?;
@@ -38,10 +38,10 @@ pub fn date_distance_vector(
 }
 
 pub fn date_distance_pace_hr_vector(
-  date_col: &Column, 
+  date_col: &Column,
   distance_col: &Column,
   pace_col: &Column,
-  hr_col: &Column
+  hr_col: &Column,
 ) -> PolarsGenType<Vec<DateDistancePaceHr>> {
   let dates = date_col.str()?;
   let distances = distance_col.f64()?;
@@ -75,6 +75,6 @@ pub fn date_vector(date_col: &Column) -> PolarsGenType<Vec<String>> {
     .collect();
 
   unique_date.sort();
-  
+
   Ok(unique_date)
 }

@@ -1,4 +1,4 @@
-use chrono::{NaiveDate, NaiveDateTime};
+use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, Utc};
 use polars::prelude::*;
 
 use crate::types::polars_type::PolarsFrame;
@@ -41,6 +41,38 @@ pub fn fill_missing_months(df: &DataFrame) -> PolarsFrame {
   let full_months_df = df!("Date" => &months)?;
 
   let result = full_months_df
+    .left_join(df, ["Date"], ["Date"])?
+    .fill_null(FillNullStrategy::Zero)?;
+
+  Ok(result)
+}
+
+pub fn fill_missing_days(df: &DataFrame) -> PolarsResult<DataFrame> {
+  let first_row = df.column("Date")?.str()?;
+
+  let mut year_month = "";
+  if let Some(date) = first_row.get(0) {
+    year_month = &date[..7];
+  }
+
+  let parts: Vec<&str> = year_month.split('-').collect();
+  let year: i32 = parts[0].parse().unwrap();
+  let year = year - 543;
+  let month: u32 = parts[1].parse().unwrap();
+
+  let year_month_date = NaiveDate::from_ymd_opt(year, month + 1, 1);
+  let last_day = if let Some(next_month_start) = year_month_date {
+    next_month_start.pred_opt().unwrap().day()
+  } else {
+    31
+  };
+
+  let days: Vec<String> = (1..=last_day)
+    .map(|d| format!("{:04}-{:02}-{:02}", year + 543, month, d))
+    .collect();
+
+  let full_days_df = df!("Date" => &days)?;
+  let result = full_days_df
     .left_join(df, ["Date"], ["Date"])?
     .fill_null(FillNullStrategy::Zero)?;
 
