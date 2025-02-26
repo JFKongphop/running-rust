@@ -1,4 +1,4 @@
-use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, Utc};
+use chrono::{Datelike, NaiveDate, NaiveDateTime};
 use polars::prelude::*;
 
 use crate::types::polars_type::PolarsFrame;
