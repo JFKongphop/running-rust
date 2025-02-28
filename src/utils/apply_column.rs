@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use polars::prelude::*;
 
 use crate::types::polars_type::PolarsFrame;
@@ -67,6 +69,52 @@ pub fn create_timestamp_column(running_df: &DataFrame) -> PolarsFrame {
 
   let mut new_df = running_df.clone();
   new_df.with_column(timestamp_col)?;
+
+  Ok(new_df)
+}
+
+fn grouping_pace(pace: &str) -> Option<String> {
+  let pace_map: HashMap<char, &str> = [
+    ('2', "2:00-3:00"),
+    ('3', "3:00-4:00"),
+    ('4', "4:00-5:00"),
+    ('5', "5:00-6:00"),
+    ('6', "6:00-7:00"),
+    ('7', "7:00-8:00"),
+    ('8', "8:00-9:00"),
+  ]
+  .into_iter()
+  .collect();
+
+  pace
+    .chars()
+    .next()
+    .and_then(|c| pace_map.get(&c).map(|&s| s.to_string()))
+    .or(Some("Other".to_string()))
+}
+
+pub fn create_pace_column(running_df: &DataFrame) -> PolarsFrame {
+  let pace_range_column = running_df
+    .column("Pace(min)")?
+    .str()?
+    .into_iter()
+    // .map(|pace| match pace {
+    //   Some(p) if p.starts_with("2") => "2:00-3:00".to_string(),
+    //   Some(p) if p.starts_with("3") => "3:00-4:00".to_string(),
+    //   Some(p) if p.starts_with("4") => "4:00-5:00".to_string(),
+    //   Some(p) if p.starts_with("5") => "5:00-6:00".to_string(),
+    //   Some(p) if p.starts_with("6") => "6:00-7:00".to_string(),
+    //   Some(p) if p.starts_with("7") => "7:00-8:00".to_string(),
+    //   Some(p) if p.starts_with("8") => "8:00-9:00".to_string(),
+    //   _ => "Other".to_string(),
+    // })
+    .map(|date_opt| date_opt.and_then(grouping_pace))
+    .collect::<StringChunked>()
+    .into_series()
+    .with_name("Pace Group".into());
+
+  let mut new_df = running_df.clone();
+  new_df.with_column(pace_range_column)?;
 
   Ok(new_df)
 }

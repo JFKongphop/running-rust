@@ -1,7 +1,7 @@
 use dotenv::dotenv;
 use running_rust::utils::{
   agg_data::{count_day, count_running, group_sum, sort_ascending, sum_distance},
-  apply_column::{activity_to_type, only_date_column, only_year_month_column},
+  apply_column::{activity_to_type, create_pace_column, only_date_column, only_year_month_column},
   fetch_data::fetch_text_csv,
   filter_column::{
     activity_filter, date_filter, distance_filter, month_filter, month_range_filter, null_filter,
@@ -90,8 +90,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
   //
   let jan_2025_day_sum_df = group_sum(&jan_2025_df, "Date", "Distance(km)")?;
   let jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
-  let a = fill_missing_days(&jan_2025_sorted)?;
-  println!("{}", a);
+  let _filled_jan_missing_day = fill_missing_days(&jan_2025_sorted)?;
+  
+  let pace_group_df = create_pace_column(&jan_2025_df)?;
+  println!("{}", pace_group_df);
 
   Ok(())
 }
