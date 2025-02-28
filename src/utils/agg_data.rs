@@ -30,3 +30,13 @@ pub fn count_running(df: &DataFrame) -> usize {
 pub fn count_day(df: &DataFrame) -> PolarsGenType<usize> {
   df.column("Date")?.n_unique()
 }
+
+pub fn join_df(left_df: &DataFrame, right_df: &DataFrame, left_column: &str, right_column: &str) -> PolarsFrame {
+  left_df
+    .left_join(
+      right_df, 
+      [left_column], 
+      [right_column]
+    )?
+    .fill_null(FillNullStrategy::Zero)
+}

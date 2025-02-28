@@ -1,6 +1,7 @@
 use dotenv::dotenv;
+use polars::prelude::{DataFrameJoinOps, FillNullStrategy};
 use running_rust::utils::{
-  agg_data::{count_day, count_running, group_count, group_sum, sort_ascending, sum_distance},
+  agg_data::{count_day, count_running, group_count, group_sum, join_df, sort_ascending, sum_distance},
   apply_column::{activity_to_type, create_pace_column, only_date_column, only_year_month_column},
   fetch_data::fetch_text_csv,
   filter_column::{
@@ -63,7 +64,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
   // println!("{:#?}", _vec_monthly_distances_2024);
 
-  let jan_2025_df = month_filter(&running_df, "2568-01")?;
+  let jan_2025_df = month_filter(&running_df, "2568-02")?;
   let jan_2025_day_sum_df = group_sum(&jan_2025_df, "Date", "Distance(km)")?;
   let mut jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
   let date_col_jan_2025 = jan_2025_sorted.column("Date")?;
@@ -87,14 +88,26 @@ async fn main() -> Result<(), Box<dyn Error>> {
   let _unique_date = date_vector(&date_col)?;
   // println!("{:#?}", _unique_date);
 
-  //
   let jan_2025_day_sum_df = group_sum(&jan_2025_df, "Date", "Distance(km)")?;
   let jan_2025_sorted = sort_ascending(&jan_2025_day_sum_df, "Date")?;
   let _filled_jan_missing_day = fill_missing_days(&jan_2025_sorted)?;
   
   let pace_group_df = create_pace_column(&jan_2025_df)?;
-  let _group_pace_count = group_count(&pace_group_df, "Pace Group", "Pace Group")?;
-  println!("{}", _group_pace_count);
+  let group_pace_count = group_count(&pace_group_df, "Pace Group", "Pace Group")?;
+  println!("{}", group_pace_count);
+
+  let group_distance_sum = group_sum(&pace_group_df, "Pace Group", "Distance(km)")?;
+  println!("{}", group_distance_sum);
+
+  let pg = "Pace Group";
+  let joined_ac_dis_feb_2025_df = join_df(
+    &group_pace_count, 
+    &group_distance_sum, 
+    pg, 
+    pg
+  )?;
+
+  println!("{}", joined_ac_dis_feb_2025_df);
 
   Ok(())
 }

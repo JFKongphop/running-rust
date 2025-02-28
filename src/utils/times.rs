@@ -3,6 +3,8 @@ use polars::prelude::*;
 
 use crate::types::polars_type::PolarsFrame;
 
+use super::agg_data::join_df;
+
 pub fn number_to_month(num: u32) -> Option<String> {
   NaiveDate::from_ymd_opt(2000, num, 1).map(|d| d.format("%B").to_string())
 }
@@ -40,9 +42,13 @@ pub fn fill_missing_months(df: &DataFrame) -> PolarsFrame {
 
   let full_months_df = df!("Date" => &months)?;
 
-  let result = full_months_df
-    .left_join(df, ["Date"], ["Date"])?
-    .fill_null(FillNullStrategy::Zero)?;
+  let date_column = "Date";
+  let result = join_df(
+    &full_months_df, 
+    &df, 
+    &date_column, 
+    &date_column
+  )?;
 
   Ok(result)
 }
@@ -72,9 +78,13 @@ pub fn fill_missing_days(df: &DataFrame) -> PolarsResult<DataFrame> {
     .collect();
 
   let full_days_df = df!("Date" => &days)?;
-  let result = full_days_df
-    .left_join(df, ["Date"], ["Date"])?
-    .fill_null(FillNullStrategy::Zero)?;
+  let date_column = "Date";
+  let result = join_df(
+    &full_days_df, 
+    &df, 
+    &date_column, 
+    &date_column
+  )?;
 
   Ok(result)
 }
