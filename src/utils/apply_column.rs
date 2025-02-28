@@ -98,16 +98,6 @@ pub fn create_pace_column(running_df: &DataFrame) -> PolarsFrame {
     .column("Pace(min)")?
     .str()?
     .into_iter()
-    // .map(|pace| match pace {
-    //   Some(p) if p.starts_with("2") => "2:00-3:00".to_string(),
-    //   Some(p) if p.starts_with("3") => "3:00-4:00".to_string(),
-    //   Some(p) if p.starts_with("4") => "4:00-5:00".to_string(),
-    //   Some(p) if p.starts_with("5") => "5:00-6:00".to_string(),
-    //   Some(p) if p.starts_with("6") => "6:00-7:00".to_string(),
-    //   Some(p) if p.starts_with("7") => "7:00-8:00".to_string(),
-    //   Some(p) if p.starts_with("8") => "8:00-9:00".to_string(),
-    //   _ => "Other".to_string(),
-    // })
     .map(|date_opt| date_opt.and_then(grouping_pace))
     .collect::<StringChunked>()
     .into_series()

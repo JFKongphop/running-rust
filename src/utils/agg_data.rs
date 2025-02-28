@@ -16,6 +16,13 @@ pub fn group_sum(df: &DataFrame, group_column: &str, sum_column: &str) -> Polars
   df.group_by([group_column])?.select([sum_column]).sum()
 }
 
+pub fn group_count(df: &DataFrame, group_column: &str, sort_column: &str) -> PolarsFrame {
+  let group_counted = df.group_by([group_column])?.count()?.sort([sort_column], Default::default())?;
+  let mut new_df = group_counted.select(["Pace Group", "Date_count"])?;
+
+  new_df.rename("Date_count", "Activity".into()).cloned()
+}
+
 pub fn count_running(df: &DataFrame) -> usize {
   df.height()
 }
