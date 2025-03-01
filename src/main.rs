@@ -1,8 +1,7 @@
 use dotenv::dotenv;
-use polars::prelude::{DataFrameJoinOps, FillNullStrategy};
 use running_rust::utils::{
   agg_data::{count_day, count_running, group_count, group_sum, join_df, sort_ascending, sum_distance},
-  apply_column::{activity_to_type, create_pace_column, only_date_column, only_year_month_column},
+  apply_column::{activity_to_type, create_pace_column, create_pace_percentage_column, only_date_column, only_year_month_column},
   fetch_data::fetch_text_csv,
   filter_column::{
     activity_filter, date_filter, distance_filter, month_filter, month_range_filter, null_filter,
@@ -100,14 +99,21 @@ async fn main() -> Result<(), Box<dyn Error>> {
   println!("{}", group_distance_sum);
 
   let pg = "Pace Group";
-  let joined_ac_dis_feb_2025_df = join_df(
+  let mut joined_ac_dis_feb_2025_df = join_df(
     &group_pace_count, 
     &group_distance_sum, 
     pg, 
     pg
   )?;
 
-  println!("{}", joined_ac_dis_feb_2025_df);
+  let feb_2025_df = joined_ac_dis_feb_2025_df.rename("Distance(km)_sum", "Distance(km)".into())?;
+
+  let feb_2025_sum_distance = sum_distance(&feb_2025_df)?;
+
+  let feb_2025_percentage_df = create_pace_percentage_column(&feb_2025_df, feb_2025_sum_distance)?;
+
+  println!("{}", feb_2025_df);
+  println!("{}", feb_2025_percentage_df);
 
   Ok(())
 }

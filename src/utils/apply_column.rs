@@ -108,3 +108,23 @@ pub fn create_pace_column(running_df: &DataFrame) -> PolarsFrame {
 
   Ok(new_df)
 }
+
+fn pace_distance_percentage(all_distance: f64, pace_distance: f64) -> Option<f64> {
+  Some(pace_distance / all_distance * 100.0)
+}
+
+pub fn create_pace_percentage_column(running_df: &DataFrame, all_distance: f64) -> PolarsFrame {
+  let pace_percentage_column = running_df
+    .column("Distance(km)")?
+    .f64()?
+    .into_iter()
+    .map(|distance_opt| distance_opt.and_then(|p| pace_distance_percentage(all_distance, p)))
+    .collect::<Float64Chunked>()
+    .into_series()
+    .with_name("Distance Percentage".into());
+
+  let mut new_df = running_df.clone();
+  new_df.with_column(pace_percentage_column)?;
+
+  Ok(new_df)
+}
