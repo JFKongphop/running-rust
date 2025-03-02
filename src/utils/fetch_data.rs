@@ -1,3 +1,5 @@
+
+
 use futures::future;
 use polars::prelude::*;
 use reqwest;
@@ -11,22 +13,37 @@ struct FileInfo {
   download_url: String,
 }
 
+#[allow(dependency_on_unit_never_type_fallback)]
 async fn fetch_folder() -> Result<Vec<String>, Box<dyn Error>> {
   let folder = env::var("FOLDER").map_err(|e| format!("Missing FOLDER env variable: {}", e))?;
+  let redis_url = env::var("REDIS_KEY").map_err(|e| format!("Missing REDIS_KEY env variable: {}", e))?;
+  let mut con = redis::Client::open(redis_url)?;
+  let key = "GITHUB_DATA";
+  let redis_github_data: Option<Vec<String>> = con.get(key)?;
 
-  let github_repo = format!("https://api.github.com/repos/{}", folder);
-  let client = reqwest::Client::new();
+  #[allow(unused_assignments)]
+  let mut csv_links: Vec<String> = vec![];
+  
+  if let Some(github_data) = redis_github_data {
+    csv_links = github_data;
+  } else {
+    let github_repo = format!("https://api.github.com/repos/{}", folder);
+    let client = reqwest::Client::new();
 
-  let resp = client
-    .get(&github_repo)
-    .header("User-Agent", "github")
-    .send()
-    .await?
-    .error_for_status()?
-    .json::<Vec<FileInfo>>()
-    .await?;
+    let resp = client
+      .get(&github_repo)
+      .header("User-Agent", "github")
+      .send()
+      .await?
+      .error_for_status()?
+      .json::<Vec<FileInfo>>()
+      .await?;
 
-  let csv_links: Vec<String> = resp.into_iter().map(|file| file.download_url).collect();
+    csv_links = resp.into_iter().map(|file| file.download_url).collect();
+    let csv_links_string = serde_json::to_string(&csv_links)?;
+
+    con.set_ex(key, csv_links_string, 30)?;
+  }
 
   if csv_links.is_empty() {
     Err("No CSV files found in the repository".into())
