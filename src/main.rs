@@ -93,10 +93,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
   
   let pace_group_df = create_pace_column(&jan_2025_df)?;
   let group_pace_count = group_count(&pace_group_df, "Pace Group", "Pace Group")?;
-  println!("{}", group_pace_count);
+  // println!("{}", group_pace_count);
 
   let group_distance_sum = group_sum(&pace_group_df, "Pace Group", "Distance(km)")?;
-  println!("{}", group_distance_sum);
+  // println!("{}", group_distance_sum);
 
   let pg = "Pace Group";
   let mut joined_ac_dis_feb_2025_df = join_df(
@@ -112,7 +112,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
   let feb_2025_percentage_df = create_pace_percentage_column(&feb_2025_df, feb_2025_sum_distance)?;
 
-  println!("{}", feb_2025_df);
+  // println!("{}", feb_2025_df);
   println!("{}", feb_2025_percentage_df);
 
   Ok(())
