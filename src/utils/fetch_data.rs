@@ -1,5 +1,3 @@
-
-
 use futures::future;
 use polars::prelude::*;
 use reqwest;
@@ -7,6 +5,8 @@ use serde::Deserialize;
 use std::{env, error::Error, io::Cursor};
 use tokio::sync::Mutex;
 use redis::Commands;
+
+use super::redis_conn::redis_connect;
 
 #[derive(Deserialize, Debug)]
 struct FileInfo {
@@ -16,8 +16,8 @@ struct FileInfo {
 #[allow(dependency_on_unit_never_type_fallback)]
 async fn fetch_folder() -> Result<Vec<String>, Box<dyn Error>> {
   let folder = env::var("FOLDER").map_err(|e| format!("Missing FOLDER env variable: {}", e))?;
-  let redis_url = env::var("REDIS_KEY").map_err(|e| format!("Missing REDIS_KEY env variable: {}", e))?;
-  let mut con = redis::Client::open(redis_url)?;
+
+  let mut con = redis_connect()?;
   let key = "GITHUB_DATA";
   let redis_github_data: Option<Vec<String>> = con.get(key)?;
 
@@ -54,8 +54,7 @@ async fn fetch_folder() -> Result<Vec<String>, Box<dyn Error>> {
 
 #[allow(dependency_on_unit_never_type_fallback)]
 pub async fn fetch_text_csv() -> Result<DataFrame, Box<dyn Error>> {
-  let redis_url = env::var("REDIS_KEY").map_err(|e| format!("Missing REDIS_KEY env variable: {}", e))?;
-  let mut con = redis::Client::open(redis_url)?;
+  let mut con = redis_connect()?;
   let key = "DATAFRAME";
   let redis_dataframe: Option<String> = con.get(key)?;
   

@@ -4,3 +4,4 @@ pub mod fetch_data;
 pub mod filter_column;
 pub mod times;
 pub mod vector_column;
+pub mod redis_conn;
